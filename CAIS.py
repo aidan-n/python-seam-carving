@@ -396,26 +396,29 @@ def CAIS(input_img, resolution, output, mark):
 	im_width, im_height = input.size
 	marked = [ ]
 
+	# a lambda function, for recurring nested functions
+	gg_filter = lambda input: gradient_filter(grayscale_filter(input))
+	
 	while im_width > resolution[0]:
-		u = find_vertical_seam(gradient_filter(grayscale_filter(input)))
+		u = find_vertical_seam(gg_filter(input))
 		if mark:
 			marked.append(u)
 		input = delete_vertical_seam(input, u)
 		im_width = input.size[0]
 		
 	while im_width < resolution[0]:
-		u = find_vertical_seam(gradient_filter(grayscale_filter(input)))
+		u = find_vertical_seam(gg_filter(input))
 		input = add_vertical_seam(input, u)
 		im_width = input.size[0]
 				
 	while im_height > resolution[1]:
-		v = find_horizontal_seam(gradient_filter(grayscale_filter(input)))
+		v = find_horizontal_seam(gg_filter(input))
 		if mark:
 			marked.append(v)
 		input = delete_horizontal_seam(input,v)
 		im_height = input.size[1]
 	while im_height < resolution[1]:
-		v = find_horizontal_seam(gradient_filter(grayscale_filter(input)))
+		v = find_horizontal_seam(gg_filter(input))
 		input = add_horizontal_seam(input,v)
 		im_height = input.size[1]
 		
