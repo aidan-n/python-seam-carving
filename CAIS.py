@@ -239,62 +239,69 @@ def mark_seam (img, path):
 	
 	print_fn( "Marking Complete." )		
 	return img
-			
 
 def delete_horizontal_seam (img, path):
-	
+
 	"""
 	Deletes the pixels in a horizontal path from img
 	@img: an input img
 	@path: pixels to delete in a horizontal path
 	"""
+	mode = 'h'
 	print_fn( "Deleting Horizontal Seam..." )
-	#raise Exception
-	img_width, img_height = img.size
-	i = Image.new(img.mode, (img_width, img_height-1))
-	input  = img.load()
-	output = i.load()
-	path_set = set(path)
-	seen_set = set()
-	for y in range(img_height):
-		for x in range(img_width):
-			if (x,y) not in path_set and x not in seen_set:
-				output[x,y] = input[x,y]
-			elif (x,y) in path_set:
-				seen_set.add(x)
-			else:
-				output[x,y-1] = input[x,y]
-	
-	print_fn( "Deletion Complete." )			
-	return i
-			
+
+	return delete_seam(img, path, mode)
 
 def delete_vertical_seam (img, path):
-		
+	
 	"""
 	Deletes the pixels in a vertical path from img
 	@img: an input img
 	@path: pixels to delete in a vertical path
 	"""
+	mode = 'v'
 	print_fn( "Deleting Vertical Seam..." )
+
+	return delete_seam(img, path, mode)
+
+def delete_seam (img, path, mode):
 	#raise Exception
 	img_width, img_height = img.size
-	i = Image.new(img.mode, (img_width-1, img_height))
+	
+	if mode == 'h':
+		new = Image.new(img.mode, (img_width, img_height-1))
+	else:
+		new = Image.new(img.mode, (img_width-1, img_height))
+		
 	input  = img.load()
-	output = i.load()
+	output = new.load()
 	path_set = set(path)
 	seen_set = set()
-	for x in range(img_width):
-		for y in range(img_height):
-			if (x,y) not in path_set and y not in seen_set:
-				output[x,y] = input[x,y]
-			elif (x,y) in path_set:
-				seen_set.add(y)
-			else:
-				output[x-1,y] = input[x,y]
 	
-	print_fn( "Deletion Complete." )		
-	return i
+	#horizontal seam deletion
+	if mode == 'h':
+		for y in range(img_height):
+			for x in range(img_width):
+				if (x,y) not in path_set and x not in seen_set:
+					output[x,y] = input[x,y]
+				elif (x,y) in path_set:
+					seen_set.add(x)
+				else:
+					output[x,y-1] = input[x,y]
+					
+	#vertical seam deletion:
+	else:
+		for x in range(img_width):
+			for y in range(img_height):
+				if (x,y) not in path_set and y not in seen_set:
+					output[x,y] = input[x,y]
+				elif (x,y) in path_set:
+					seen_set.add(y)
+				else:
+					output[x-1,y] = input[x,y]
+
+	print_fn( "Deletion Complete." )			
+	return img
 	
 def add_vertical_seam(img, path):
 	"""
